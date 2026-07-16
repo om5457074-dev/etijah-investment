@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>اتجاه | استثمارك الآمن</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; flex-direction: column; background-color: #000; color: white; }
+        .ticker-wrapper { width: 100%; height: 72px; background: rgba(0,0,0,0.5); }
+        .hero { flex-grow: 1; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('logo6.jpg'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        h1 { font-size: 3rem; margin-bottom: 20px; color: #fff; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+        .btn-start { padding: 15px 40px; font-size: 20px; background-color: #f17417; color: white; border: none; border-radius: 50px; cursor: pointer; transition: 0.3s; font-weight: bold; }
+        .btn-start:hover { background-color: #d16212; transform: scale(1.1); }
+        
+        /* تصميم الـ Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: #1a1a1a; padding: 30px; border-radius: 15px; width: 350px; text-align: center; border: 1px solid #f17417; }
+        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; box-sizing: border-box; }
+        .close-btn { color: white; float: left; cursor: pointer; font-size: 20px; }
+        
+        .social-sidebar { position: fixed; left: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 20px; }
+        .social-sidebar a { font-size: 28px; color: white; transition: 0.3s; }
+        .social-sidebar a:hover { color: #f17417; transform: scale(1.2); }
+    </style>
+</head>
+<body>
+
+    <div class="ticker-wrapper" id="ticker-container"></div>
+
+    <div class="hero">
+        <h2 style="margin-top: 0; color: white;">اتجاهك نحو استثمار آمن ومستقبل واعد</h2>
+        <button class="btn-start" onclick="openModal()">ابدأ الآن</button>
+    </div>
+
+    <!-- نافذة التسجيل -->
+    <div id="registrationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 style="color: #f17417;">سجل بياناتك</h2>
+            <form id="contactForm" action="https://api.sheetmonkey.io/form/JsFev4ua9fhiwr1T9HPvH" method="POST">
+                <input type="text" name="الاسم" placeholder="الاسم" required>
+                <input type="tel" name="رقم الهاتف" placeholder="رقم الهاتف" required>
+                <input type="email" name="البريد الالكتروني" placeholder="البريد الالكتروني" required>
+                <select name="السوق المفضل" required>
+                    <option value="US">السوق الأمريكي</option>
+                    <option value="SA">السوق السعودي</option>
+                    <option value="Both">كلاهما</option>
+                </select>
+               <button type="submit" class="btn-start" style="width: 100%; margin-top: 10px; padding: 10px;">إرسال</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="social-sidebar">
+        <a href="https://wa.me/" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://twitter.com/" target="_blank"><i class="fab fa-twitter"></i></a>
+        <a href="https://t.me/" target="_blank"><i class="fab fa-telegram"></i></a>
+        <a href="https://snapchat.com/" target="_blank"><i class="fab fa-snapchat"></i></a>
+        <a href="https://tiktok.com/" target="_blank"><i class="fab fa-tiktok"></i></a>
+    </div>
+
+    <script>
+        function openModal() { document.getElementById('registrationModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('registrationModal').style.display = 'none'; }
+        window.onclick = function(event) { if (event.target == document.getElementById('registrationModal')) closeModal(); }
+
+        function loadTicker() {
+            const container = document.getElementById('ticker-container');
+            const now = new Date();
+            const saudiTime = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'Asia/Riyadh',
+                hour: 'numeric',
+                minute: 'numeric',
+                hour12: false,
+                weekday: 'long'
+            }).formatToParts(now);
+            
+            let day = saudiTime.find(p => p.type === 'weekday').value;
+            let hour = parseInt(saudiTime.find(p => p.type === 'hour').value, 10);
+            let isSaudiOpen = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'].includes(day) && (hour >= 10 && hour < 15);
+            
+            const symbols = isSaudiOpen ? [
+                {"proName": "TADAWUL:2222", "title": "أرامكو"},
+                {"proName": "TADAWUL:1150", "title": "مصرف الإنماء"},
+                {"proName": "TADAWUL:7010", "title": "STC"}
+            ] : [
+                {"proName": "NASDAQ:AAPL", "title": "Apple"},
+                {"proName": "NASDAQ:TSLA", "title": "Tesla"},
+                {"proName": "NYSE:GOLD", "title": "Gold"}
+            ];
+            
+            const script = document.createElement('script');
+            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+            script.async = true;
+            script.innerHTML = JSON.stringify({ "symbols": symbols, "colorTheme": "dark", "isTransparent": true, "displayMode": "adaptive", "locale": "ar" });
+            container.innerHTML = '';
+            container.appendChild(script);
+        }
+        loadTicker();
+    </script>
+</body>
+</html>
